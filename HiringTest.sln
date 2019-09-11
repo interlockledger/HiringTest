@@ -3,7 +3,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29215.179
 MinimumVisualStudioVersion = 15.0.26124.0
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HiringTest", "HiringTest.csproj", "{7A4E7AA7-8C5A-4A3F-BD11-0C24BC642BAA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HiringTest", "HiringTest/HiringTest.csproj", "{7A4E7AA7-8C5A-4A3F-BD11-0C24BC642BAA}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Global", "Global", "{945E9F4D-1F64-4F19-B1AB-79E5012ECE76}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+		.gitattributes = .gitattributes
+		.gitignore = .gitignore
+		README.md = README.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

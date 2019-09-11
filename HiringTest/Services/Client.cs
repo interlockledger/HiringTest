@@ -59,7 +59,7 @@ namespace HiringTest
         }
 
         public override async Task<Success> SinkAsync(IEnumerable<byte> message, IActiveChannel activeChannel)
-                    => Received(await Process(message, activeChannel.Channel));
+            => Received(await Process(message, activeChannel.Channel));
 
         protected override void Run(IPeerServices peerServices) {
             using var client = peerServices.GetClient("localhost", 8080);
