@@ -33,7 +33,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using InterlockLedger.Peer2Peer;
 using InterlockLedger.Tags;
@@ -42,10 +41,12 @@ namespace HiringTest
 {
     internal class Client : BaseSink
     {
-        public Client() : base("Client") {
+        public Client() : base("Client", "Test") {
         }
 
         public bool DoneReceiving { get; set; } = false;
+
+        public override IEnumerable<string> LocalResources => Enumerable.Empty<string>();
 
         public string Prompt => @"Command (
     x to exit,
@@ -53,9 +54,13 @@ namespace HiringTest
     s... send file ...
     ): ";
 
-        public void SendPing(IActiveChannel channel) {
-            var ping = new PingData(NodeId, DateTimeOffset.Now, SupportedNetworkProtocolFeatures.ToArray());
-            channel.Send(ping.AsPayload.EncodedBytes);
+        public override IEnumerable<string> SupportedNetworkProtocolFeatures => Enumerable.Empty<string>();
+
+        public void SendPing(IActiveChannel channel, bool visible = false) {
+            var ping = new PingData(NodeId, DateTimeOffset.Now, SupportedNetworkProtocolFeatures.ToArray()) {
+                Visible = visible
+            };
+            Send(channel, ping.AsPayload);
         }
 
         public override async Task<Success> SinkAsync(IEnumerable<byte> message, IActiveChannel activeChannel)
@@ -81,7 +86,7 @@ namespace HiringTest
                     break;
                 var channel = client.AllocateChannel(this);
                 if (command == "w")
-                    SendPing(channel);
+                    SendPing(channel, visible: true);
                 else
                     throw new NotImplementedException("Need to implement Send File feature!");
             }

@@ -12,13 +12,13 @@ namespace HiringTest
         public ushort Version { get; set; }
 
         public T FromStream(Stream s) {
-            Version = s.BigEndianReadUShort();   // Field index 0 //
+            Version = s.DecodeUShort();  // Field index 0 //
             DecodeRemainingFields(s);
             return (T)this;
         }
 
         public void ToStream(Stream s) {
-            s.EncodeUShort(Version);              // Field index 0 //
+            s.EncodeUShort(Version);     // Field index 0 //
             EncodeRemainingStateTo(s);
         }
 

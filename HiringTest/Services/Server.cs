@@ -45,7 +45,7 @@ namespace HiringTest
 {
     internal class Server : BaseSink
     {
-        public Server() : base("Server") {
+        public Server() : base("Server", "Local Node") {
         }
 
         public string Url => $"{NetworkProtocolName.ToLowerInvariant()}://{PublishAtAddress}:{PublishAtPortNumber}/";
@@ -72,14 +72,6 @@ namespace HiringTest
 
         private bool _stop = false;
 
-        private static void Send(IActiveChannel channel, byte[] bytes) {
-            try {
-                channel.Send(bytes);
-            } catch (SocketException) {
-                // Do Nothing
-            }
-        }
-
         private async Task Dequeue() {
             do {
                 if (_queue.TryDequeue(out var tuple))
@@ -91,10 +83,11 @@ namespace HiringTest
         private Task SinkAsServer(IEnumerable<byte> message, IActiveChannel channel) {
             if (message.Any()) {
                 if (message.First() == PingData.DefinedTagId) {
-                    var ping = ILTag.DeserializeFrom(message.ToArray()) as Payload<PingData>;
-                    Console.WriteLine($@"[{channel}] {ping}");
+                    var ping = (ILTag.DeserializeFrom(message.ToArray()) as Payload<PingData>).Value;
+                    if (ping.Visible)
+                        Console.WriteLine($@"[{channel}] Pinged from '{ping}'");
                     var pong = new PongData(Id, DateTimeOffset.Now, SupportedNetworkProtocolFeatures.ToArray());
-                    Send(channel, pong.AsPayload.EncodedBytes);
+                    Send(channel, pong.AsPayload);
                 }
             }
             return Task.CompletedTask;

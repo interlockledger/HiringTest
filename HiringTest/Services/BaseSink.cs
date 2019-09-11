@@ -37,15 +37,17 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using InterlockLedger.ILInt;
+using InterlockLedger.Tags;
 using InterlockLedger.Peer2Peer;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using System.Net.Sockets;
 
 namespace HiringTest
 {
     internal abstract class BaseSink : AbstractNodeSink, IChannelSink
     {
-        public BaseSink(string message) {
+        public BaseSink(string message, string nodeId) {
             PublishAtAddress = HostAtAddress = "localhost";
             PublishAtPortNumber = HostAtPortNumber = 8080;
             ListeningBufferSize = 512;
@@ -53,13 +55,14 @@ namespace HiringTest
             MessageTag = 100;
             NetworkName = "HiringTest";
             NetworkProtocolName = "Hiring";
-            NodeId = "Local Node";
+            NodeId = nodeId;
             _message = message ?? throw new ArgumentNullException(nameof(message));
             _source = new CancellationTokenSource();
         }
 
-        public override IEnumerable<string> LocalResources { get; } = new string[] { "Document" };
-        public override IEnumerable<string> SupportedNetworkProtocolFeatures { get; } = new string[] { "Echo", "Who", "TripleEcho" };
+        public override IEnumerable<string> LocalResources { get; } = new string[0];
+
+        public override IEnumerable<string> SupportedNetworkProtocolFeatures { get; } = new string[] { "Who" };
 
         public static string AsString(IEnumerable<byte> text) => Encoding.UTF8.GetString(text.ToArray());
 
@@ -80,6 +83,11 @@ namespace HiringTest
             var serviceProvider = Configure(_source, portDelta: 4, this);
             using var peerServices = serviceProvider.GetRequiredService<IPeerServices>();
             Run(peerServices);
+        }
+
+        public byte[] ToMessage(ILTag payload) {
+            var payloadBytes = payload.EncodedBytes;
+            return MessageTag.AsILInt().Append(((ulong)payloadBytes.Length).AsILInt()).Append(payloadBytes);
         }
 
         protected readonly CancellationTokenSource _source;
@@ -116,6 +124,14 @@ namespace HiringTest
             Console.TreatControlCAsInput = false;
             Console.CancelKeyPress += Cancel;
             return _source;
+        }
+
+        protected void Send(IActiveChannel channel, ILTag payload) {
+            try {
+                channel.Send(ToMessage(payload));
+            } catch (SocketException) {
+                // Do Nothing
+            }
         }
     }
 }
