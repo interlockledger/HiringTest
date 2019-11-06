@@ -1,5 +1,5 @@
 # HiringTest
-A project template for testing dev applicants
+A project template for testing dev/interns applicants
 
 ## How to Build
 
@@ -24,8 +24,8 @@ You can then try the 'w' command to see if things are working (currently it shou
 ### Rules
 
 You should abide to the formatting/code conventions already in the sources (.editorconfig is used to help with that if you are using Visual Studio)
-If using Visual Studio, use the latest 2019 release, supporting the preview of C# 8.0
-.NET Core must be version 2.2 (do not use previews for 3.x for now)
+If using Visual Studio, use the latest 2019 release, supporting C# 8.0.
+.NET Core must be version 2.2 (do not use 3.x for now)
 
 Follow the architecture of defining Data classes for the commands/responses based on AbstractData, and serialize their Payload wrapper as the message body in the Peer2Peer channel
 
