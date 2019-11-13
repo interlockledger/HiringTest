@@ -7,7 +7,7 @@ namespace HiringTest
 {
     public class TagDeserializersProvider : ITagDeserializersProvider
     {
-        public readonly static TagDeserializersProvider Instance = new TagDeserializersProvider();
+        public static readonly TagDeserializersProvider Instance = new TagDeserializersProvider();
 
         public IEnumerable<(ulong id, Func<Stream, ILTag> deserializer, Func<object, ILTag> jsonDeserializer)> Deserializers {
             get {

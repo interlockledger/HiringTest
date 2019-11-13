@@ -48,7 +48,7 @@ namespace HiringTest
 
         public override IEnumerable<string> LocalResources => Enumerable.Empty<string>();
 
-        public string Prompt => @"Command (
+        public static string Prompt => @"Command (
     x to exit,
     w to get who is answering,
     s... send file ...
@@ -69,7 +69,7 @@ namespace HiringTest
         protected override void Run(IPeerServices peerServices) {
             using var client = peerServices.GetClient("localhost", 8080);
             var liveness = new LivenessListener(client, this);
-            while (!_source.IsCancellationRequested) {
+            while (!Source.IsCancellationRequested) {
                 Console.WriteLine();
                 Console.Write(Prompt);
                 while (!Console.KeyAvailable) {

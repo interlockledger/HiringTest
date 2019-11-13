@@ -33,15 +33,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 using System;
 using System.Buffers;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using InterlockLedger.ILInt;
-using InterlockLedger.Tags;
 using InterlockLedger.Peer2Peer;
+using InterlockLedger.Tags;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using System.Net.Sockets;
 
 namespace HiringTest
 {
@@ -57,10 +58,10 @@ namespace HiringTest
             NetworkProtocolName = "Hiring";
             NodeId = nodeId;
             _message = message ?? throw new ArgumentNullException(nameof(message));
-            _source = new CancellationTokenSource();
+            Source = new CancellationTokenSource();
         }
 
-        public override IEnumerable<string> LocalResources { get; } = new string[0];
+        public override IEnumerable<string> LocalResources { get; } = Array.Empty<string>();
 
         public override IEnumerable<string> SupportedNetworkProtocolFeatures { get; } = new string[] { "Who" };
 
@@ -80,7 +81,7 @@ namespace HiringTest
 
         public void Run() {
             PrepareConsole(_message);
-            var serviceProvider = Configure(_source, portDelta: 4, this);
+            var serviceProvider = Configure(Source, portDelta: 4, this);
             using var peerServices = serviceProvider.GetRequiredService<IPeerServices>();
             Run(peerServices);
         }
@@ -90,9 +91,22 @@ namespace HiringTest
             return MessageTag.AsILInt().Append(((ulong)payloadBytes.Length).AsILInt()).Append(payloadBytes);
         }
 
-        protected readonly CancellationTokenSource _source;
+        [SuppressMessage("Usage", "CA2213:Disposable fields should be disposed", Justification = AbstractDisposable.DisposedJustification)]
+        protected readonly CancellationTokenSource Source;
+
+        protected override void DisposeManagedResources() => Source.Dispose();
+
+        protected override void DisposeUnmanagedResources() { }
 
         protected abstract void Run(IPeerServices peerServices);
+
+        protected void Send(IActiveChannel channel, ILTag payload) {
+            try {
+                channel.Send(ToMessage(payload));
+            } catch (SocketException) {
+                // Do Nothing
+            }
+        }
 
         private readonly string _message;
 
@@ -118,20 +132,12 @@ namespace HiringTest
         private CancellationTokenSource PrepareConsole(string message) {
             void Cancel(object sender, ConsoleCancelEventArgs e) {
                 Console.WriteLine("Exiting...");
-                _source.Cancel();
+                Source.Cancel();
             }
             Console.WriteLine(message);
             Console.TreatControlCAsInput = false;
             Console.CancelKeyPress += Cancel;
-            return _source;
-        }
-
-        protected void Send(IActiveChannel channel, ILTag payload) {
-            try {
-                channel.Send(ToMessage(payload));
-            } catch (SocketException) {
-                // Do Nothing
-            }
+            return Source;
         }
     }
 }
