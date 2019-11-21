@@ -4,10 +4,10 @@ A project template for testing dev/interns applicants
 ## How to Build
 
 1. Fork this repo and clone to your machine, also clone and checkout repos 
-https://github.com/interlockledger/peer2peer, https://github.com/interlockledger/il2tags and https://github.com/interlockledger/ilint
+https://github.com/interlockledger/interlockledger-peer2peer, https://github.com/interlockledger/interlockledger-tags and https://github.com/interlockledger/interlockledger-tags-ilint
 2. Set an environment variable INTERLOCK_LOCAL_NUGETS_FOLDER, persisted, to a path your user can write when building the above repos
 3. Add the path chosen in 2 to the nuget sources
-4. Build repos ilint, iltags, peer2peer in that order so that packages published are used by the next build
+4. Build repos interlockledger-tags-ilint, interlockledger-tags, interlockledger-peer2peer in that order so that packages published are used by the next build
 5. Lastly build this repo
 
 ## How to Test
