@@ -38,7 +38,6 @@ using System.Linq;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
-using InterlockLedger.ILInt;
 using InterlockLedger.Peer2Peer;
 using InterlockLedger.Tags;
 using Microsoft.Extensions.DependencyInjection;
